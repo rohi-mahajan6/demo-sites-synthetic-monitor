@@ -15,12 +15,12 @@
       "alertedStatus": null
     },
     "inventree": {
-      "lastStatus": "fail",
-      "nonPassStreak": 1,
+      "lastStatus": "pass",
+      "nonPassStreak": 0,
       "unavailableStreak": 0,
       "issueNumber": null,
       "alertedStatus": null
     }
   },
-  "updatedAt": "2026-11-24T12:24:17.167Z"
+  "updatedAt": "2026-11-24T13:07:29.756Z"
 }
