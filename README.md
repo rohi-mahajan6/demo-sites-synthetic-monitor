@@ -26,8 +26,10 @@ Timeouts: 30 s for navigation, 15 s for element waits, 20 s for the InvenTree lo
 | ------ | ------- |
 | `pass` | Every step succeeded |
 | `fail` | The site answered, but a step did not see what it expected (assertion, missing element, HTTP 4xx) |
-| `unavailable` | DNS, TLS or connection failure, HTTP 5xx, or no response to the first navigation within 30 s |
+| `unavailable` | DNS, TLS or connection failure, HTTP 5xx, HTTP 429 rate limiting on a login API, or no response to the first navigation within 30 s |
 | `error` | A problem in the monitor itself (missing credential, browser crash, code bug) |
+
+Where a login goes through an API (ParaBank, InvenTree), the check reads that API's answer, so a rejected login (`fail`, HTTP 400/401/403) is told apart from rate limiting or a server error (`unavailable`).
 
 A journey that does not pass is retried once, 30 s later, in a fresh browser context. Both attempts are recorded. A pass on the retry is stored as `pass` with `flaky: true`. Screenshots and Playwright traces of failed attempts are uploaded as a workflow artifact and kept for 30 days.
 

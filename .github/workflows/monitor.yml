@@ -79,6 +79,7 @@ jobs:
       # A site being down is data, not a job failure. Exit 1 = no run recorded; exit 2 = run recorded but an
       # alert could not be delivered. Either way the job turns red, and results that exist are still committed.
       - name: Run monitor
+        id: monitor
         run: node src/run-monitor.js --results-dir data-branch/results --state-file data-branch/state.json --artifacts-dir artifacts
 
       - name: Upload screenshots and traces of failed journeys
@@ -89,8 +90,10 @@ jobs:
           path: artifacts
           retention-days: 30
 
+      # Only when the monitor actually ran (it may have recorded results and then failed to send an alert).
+      # If an earlier step failed, there is nothing to commit and this step would only add a second error.
       - name: Commit results to the data branch
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && steps.monitor.outcome != 'skipped' }}
         run: |
           cd data-branch
           git config user.name "github-actions[bot]"

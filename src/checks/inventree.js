@@ -6,6 +6,8 @@
  * login-password) -> dashboard loads -> the session belongs to the configured user
  * -> parts list renders the rows the parts API returned (count and first part name match).
  */
+const { UnavailableError, JourneyFailure } = require('../utils/status');
+
 const BASE = 'https://demo.inventree.org';
 
 async function run({ page, step, goto, apiGet, expect, credentials, timeouts, meta }) {
@@ -21,12 +23,42 @@ async function run({ page, step, goto, apiGet, expect, credentials, timeouts, me
   await step('open login page', async () => {
     await goto(`${BASE}/web/login`);
     await page.locator('input[aria-label="login-username"]').waitFor();
+    // The inputs appear before the app has finished its startup session checks (GET
+    // /api/auth/v1/auth/session, run twice). Typing during that window is lost: the form re-renders,
+    // the fields are cleared and the click sends no login request. Wait for the network to settle.
+    // If it never goes fully idle, carry on: the value check in the next step still catches a reset form.
+    await page.waitForLoadState('networkidle', { timeout: timeouts.elementMs }).catch(() => {});
   });
 
   await step('log in', async () => {
-    await page.locator('input[aria-label="login-username"]').fill(credentials.username);
-    await page.locator('input[aria-label="login-password"]').fill(credentials.password);
+    const username = page.locator('input[aria-label="login-username"]');
+    const password = page.locator('input[aria-label="login-password"]');
+    await username.fill(credentials.username);
+    await password.fill(credentials.password);
+    // Make sure the form still holds what was typed before submitting it.
+    const typed = await username.inputValue();
+    const typedPassword = await password.inputValue();
+    if (typed !== credentials.username || typedPassword !== credentials.password) {
+      throw new JourneyFailure('login form was reset before submit (fields lost their values)');
+    }
+    // Read the login API's own answer, so a rejected login, rate limiting and a server error each get
+    // a clear result instead of all looking like "the redirect timed out".
+    const loginResponse = page.waitForResponse(
+      (r) => new URL(r.url()).pathname === '/api/auth/v1/auth/login' && r.request().method() === 'POST',
+      { timeout: timeouts.inventreeLoginRedirectMs },
+    );
     await page.locator('button[type="submit"]', { hasText: 'Log In' }).click();
+    const res = await loginResponse;
+    const status = res.status();
+    meta.loginHttpStatus = status;
+    if (status >= 500) throw new UnavailableError(`login API answered HTTP ${status}`, status);
+    // 429: the site is up but refuses logins from this client for now. Not a broken journey,
+    // so it counts as unavailable (alerts after 3 runs, never closes an issue).
+    if (status === 429) throw new UnavailableError('login rate-limited: login API answered HTTP 429', status);
+    if (status === 400 || status === 401 || status === 403) {
+      throw new JourneyFailure(`login rejected: login API answered HTTP ${status} (check the credentials)`, status);
+    }
+    if (!res.ok()) throw new JourneyFailure(`login API answered HTTP ${status}`, status);
     // The redirect comes after the auth calls finish (about 6 s in exploration); then the dashboard renders.
     await page.waitForURL((u) => !u.pathname.includes('/login'), { timeout: timeouts.inventreeLoginRedirectMs });
     await page.waitForFunction(() => document.title.includes('Dashboard'));
