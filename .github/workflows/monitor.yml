@@ -1,0 +1,156 @@
+name: Monitor
+
+on:
+  schedule:
+    # 00:30, 06:30, 12:30, 18:30 UTC (06:00, 12:00, 18:00, 00:00 IST). Off the top of the hour.
+    - cron: '30 0,6,12,18 * * *'
+  workflow_dispatch:
+
+# Never run two monitors at once, and never cancel one that is already running:
+# a cancelled run would leave a gap in the history and could skip an alert.
+concurrency:
+  group: monitor
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  monitor:
+    name: Run journeys
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write   # push result files to the data branch
+      issues: write     # open, comment on and close alert issues
+    env:
+      SAUCE_USERNAME: standard_user
+      SAUCE_PASSWORD: ${{ secrets.SAUCE_PASSWORD }}
+      PARABANK_USERNAME: ${{ secrets.PARABANK_USERNAME }}
+      PARABANK_PASSWORD: ${{ secrets.PARABANK_PASSWORD }}
+      INVENTREE_USERNAME: ${{ secrets.INVENTREE_USERNAME }}
+      INVENTREE_PASSWORD: ${{ secrets.INVENTREE_PASSWORD }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+
+      # Fail fast with a clear message if a site credential is missing (an unset secret arrives empty).
+      # Telegram is optional: without it, alerts still go to GitHub Issues.
+      - name: Check required secrets
+        run: |
+          missing=""
+          for name in SAUCE_PASSWORD PARABANK_USERNAME PARABANK_PASSWORD INVENTREE_USERNAME INVENTREE_PASSWORD; do
+            [ -n "${!name}" ] || missing="$missing $name"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::Missing repository secret(s):$missing"
+            exit 1
+          fi
+          if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
+            echo "::warning::Telegram secrets not set; alerts will only go to GitHub Issues."
+          fi
+          echo "Required secrets are present."
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      # Results live on a separate "data" branch so main only ever contains code.
+      # The first run creates the branch as an orphan with no files.
+      - name: Check out the data branch
+        run: |
+          if git ls-remote --exit-code --heads origin data >/dev/null; then
+            git fetch --depth=1 origin data:refs/remotes/origin/data
+            git worktree add -b data data-branch origin/data
+          else
+            git worktree add --detach data-branch
+            git -C data-branch switch --orphan data
+          fi
+
+      # A site being down is data, not a job failure. Exit 1 = no run recorded; exit 2 = run recorded but an
+      # alert could not be delivered. Either way the job turns red, and results that exist are still committed.
+      - name: Run monitor
+        run: node src/run-monitor.js --results-dir data-branch/results --state-file data-branch/state.json --artifacts-dir artifacts
+
+      - name: Upload screenshots and traces of failed journeys
+        if: ${{ !cancelled() && hashFiles('artifacts/**') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: failure-evidence-${{ github.run_id }}
+          path: artifacts
+          retention-days: 30
+
+      - name: Commit results to the data branch
+        if: ${{ !cancelled() }}
+        run: |
+          cd data-branch
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No new results to commit."; exit 0
+          fi
+          git commit -m "results: run ${{ github.run_id }}"
+          for attempt in 1 2 3; do
+            git push origin data && exit 0
+            git pull --rebase origin data || true
+          done
+          echo "::error::Could not push results to the data branch"; exit 1
+
+  dashboard:
+    name: Build status page
+    needs: monitor
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Before the first successful monitor run there is no data branch: build the "no results yet" page.
+      - name: Check out the data branch
+        run: |
+          if git ls-remote --exit-code --heads origin data >/dev/null; then
+            git fetch --depth=1 origin data:refs/remotes/origin/data
+            git worktree add --detach data-branch origin/data
+          else
+            echo "::notice::No data branch yet; the status page will say no results are recorded."
+            mkdir -p data-branch/results
+          fi
+
+      - name: Build dashboard
+        run: node scripts/build-dashboard.js --results-dir data-branch/results --out site
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    name: Deploy status page
+    needs: dashboard
+    if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

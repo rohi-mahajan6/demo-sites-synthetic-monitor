@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Secrets and local config
+.env
+.env.*
+!.env.example
+
+# Local run output (in CI, results are committed to the "data" branch, not main)
+artifacts/
+results-local/
+site/
+data-branch/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log

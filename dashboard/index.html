@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Demo Sites Status</title>
+  <meta name="description" content="Synthetic monitoring of one critical journey on each of three public demo sites.">
+  <style>
+    :root {
+      color-scheme: light;
+      --surface-0: #f6f6f4;
+      --surface-1: #fcfcfb;
+      --border: #e2e1dc;
+      --grid: #ecebe7;
+      --text-primary: #0b0b0b;
+      --text-secondary: #52514e;
+      --text-muted: #77766f;
+      --series-1: #2a78d6;
+      --good: #0ca30c;
+      --warning: #fab219;
+      --serious: #ec835a;
+      --critical: #d03b3b;
+      --neutral: #8f8e88;
+      --link: #1c5cab;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --surface-0: #121211;
+        --surface-1: #1a1a19;
+        --border: #2f2f2d;
+        --grid: #262624;
+        --text-primary: #f0efec;
+        --text-secondary: #c3c2b7;
+        --text-muted: #96958c;
+        --series-1: #3987e5;
+        --neutral: #6f6e68;
+        --link: #86b6ef;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --surface-0: #121211;
+      --surface-1: #1a1a19;
+      --border: #2f2f2d;
+      --grid: #262624;
+      --text-primary: #f0efec;
+      --text-secondary: #c3c2b7;
+      --text-muted: #96958c;
+      --series-1: #3987e5;
+      --neutral: #6f6e68;
+      --link: #86b6ef;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--surface-0);
+      color: var(--text-primary);
+      font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    main { max-width: 1120px; margin: 0 auto; padding: 24px 16px 48px; }
+    a { color: var(--link); }
+    h1 { font-size: 24px; margin: 0 0 4px; }
+    h2 { font-size: 17px; margin: 32px 0 12px; }
+    .sub { color: var(--text-secondary); margin: 0; }
+    .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); margin-top: 20px; }
+    .card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 16px; min-width: 0; }
+    .card h3 { font-size: 16px; margin: 0; }
+    .card .journey { color: var(--text-secondary); font-size: 13px; margin: 0 0 12px; }
+    .badge { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 14px; }
+    .dot { width: 18px; height: 18px; border-radius: 50%; display: inline-grid; place-items: center; color: #fff; font-size: 11px; font-weight: 700; flex: none; }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0; }
+    .stat .v { font-size: 17px; white-space: nowrap; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .stat .k { color: var(--text-muted); font-size: 12px; }
+    .strip { display: flex; gap: 2px; margin: 4px 0 2px; }
+    .strip span { flex: 1; height: 22px; border-radius: 3px; min-width: 3px; }
+    .strip-caption { display: flex; justify-content: space-between; color: var(--text-muted); font-size: 12px; }
+    .chart-wrap { position: relative; height: 150px; margin-top: 12px; }
+    .meta { color: var(--text-muted); font-size: 12px; margin-top: 8px; overflow-wrap: anywhere; }
+    .legend { display: flex; flex-wrap: wrap; gap: 14px; color: var(--text-secondary); font-size: 13px; margin-top: 12px; }
+    .legend .badge { font-weight: 400; font-size: 13px; }
+    .table-wrap { overflow-x: auto; background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; }
+    table { border-collapse: collapse; width: 100%; font-size: 13px; }
+    th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+    th { color: var(--text-secondary); font-weight: 600; }
+    td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+    tr:last-child td { border-bottom: 0; }
+    .empty { background: var(--surface-1); border: 1px dashed var(--border); border-radius: 10px; padding: 32px 16px; text-align: center; color: var(--text-secondary); margin-top: 20px; }
+    footer { color: var(--text-muted); font-size: 12px; margin-top: 32px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Demo Sites Status</h1>
+    <p class="sub" id="summary">Loading…</p>
+    <div class="legend" id="legend"></div>
+    <div id="content"></div>
+    <footer>
+      One real browser journey per site, every 6 hours, from GitHub Actions. Uptime counts pass runs
+      among runs that measured the site; monitor errors are left out. Latency is the duration of passing journeys.
+      Not affiliated with Sauce Labs, Parasoft or InvenTree.
+    </footer>
+  </main>
+  <script src="data.js"></script>
+  <script src="chart.umd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
