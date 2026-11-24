@@ -1,0 +1,182 @@
+{
+  "schemaVersion": 1,
+  "runId": "45393071911",
+  "timestamp": "2026-11-24T12:24:17.167Z",
+  "trigger": "workflow_dispatch",
+  "ci": {
+    "runUrl": "https://github.com/rohi-mahajan6/demo-sites-synthetic-monitor/actions/runs/45393071911",
+    "runner": "Linux (GitHub Actions)"
+  },
+  "results": [
+    {
+      "site": "saucedemo",
+      "siteName": "SauceDemo",
+      "journey": "checkout",
+      "url": "https://www.saucedemo.com/",
+      "status": "pass",
+      "durationMs": 755,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "pass",
+          "durationMs": 755,
+          "failingStep": null
+        }
+      ],
+      "flaky": false,
+      "failingStep": null,
+      "steps": [
+        {
+          "name": "open login page",
+          "status": "pass",
+          "durationMs": 243
+        },
+        {
+          "name": "log in",
+          "status": "pass",
+          "durationMs": 171
+        },
+        {
+          "name": "add backpack to cart",
+          "status": "pass",
+          "durationMs": 45
+        },
+        {
+          "name": "open cart",
+          "status": "pass",
+          "durationMs": 63
+        },
+        {
+          "name": "enter checkout details",
+          "status": "pass",
+          "durationMs": 165
+        },
+        {
+          "name": "finish order",
+          "status": "pass",
+          "durationMs": 68
+        }
+      ],
+      "meta": {
+        "inventoryItems": 6,
+        "total": "$32.39"
+      },
+      "artifacts": []
+    },
+    {
+      "site": "parabank",
+      "siteName": "ParaBank",
+      "journey": "login-balance",
+      "url": "https://parabank.parasoft.com/parabank/",
+      "status": "pass",
+      "durationMs": 1382,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "pass",
+          "durationMs": 1382,
+          "failingStep": null
+        }
+      ],
+      "flaky": false,
+      "failingStep": null,
+      "steps": [
+        {
+          "name": "API login",
+          "status": "pass",
+          "durationMs": 251
+        },
+        {
+          "name": "open home page",
+          "status": "pass",
+          "durationMs": 518
+        },
+        {
+          "name": "log in",
+          "status": "pass",
+          "durationMs": 297
+        },
+        {
+          "name": "accounts overview",
+          "status": "pass",
+          "durationMs": 88
+        },
+        {
+          "name": "account activity",
+          "status": "pass",
+          "durationMs": 228
+        }
+      ],
+      "meta": {
+        "accountCount": 12
+      },
+      "artifacts": []
+    },
+    {
+      "site": "inventree",
+      "siteName": "InvenTree demo",
+      "journey": "login-dashboard",
+      "url": "https://demo.inventree.org/",
+      "status": "fail",
+      "durationMs": 22792,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "fail",
+          "durationMs": 22734,
+          "failingStep": {
+            "name": "log in",
+            "index": 2,
+            "error": "page.waitForURL: Timeout 20000ms exceeded.",
+            "httpStatus": null
+          }
+        },
+        {
+          "attempt": 2,
+          "status": "fail",
+          "durationMs": 22792,
+          "failingStep": {
+            "name": "log in",
+            "index": 2,
+            "error": "page.waitForURL: Timeout 20000ms exceeded.",
+            "httpStatus": null
+          }
+        }
+      ],
+      "flaky": false,
+      "failingStep": {
+        "name": "log in",
+        "index": 2,
+        "error": "page.waitForURL: Timeout 20000ms exceeded.",
+        "httpStatus": null
+      },
+      "steps": [
+        {
+          "name": "API server info",
+          "status": "pass",
+          "durationMs": 546
+        },
+        {
+          "name": "open login page",
+          "status": "pass",
+          "durationMs": 2112
+        },
+        {
+          "name": "log in",
+          "status": "fail",
+          "durationMs": 20134
+        }
+      ],
+      "meta": {
+        "serverVersion": "1.8.0 dev",
+        "apiVersion": 583
+      },
+      "artifacts": [
+        "inventree/attempt-1.png",
+        "inventree/attempt-1-trace.zip",
+        "inventree/attempt-2.png",
+        "inventree/attempt-2-trace.zip"
+      ]
+    }
+  ]
+}
