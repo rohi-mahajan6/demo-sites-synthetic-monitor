@@ -67,15 +67,46 @@ The monitor job exits 0 when a run is recorded, even if sites are down, because 
 
 ## 6. Execution evidence
 
-Local run on 2026-11-24 (Windows, Node 26, Playwright 1.65.1), real sites:
+Live status page: **https://rohi-mahajan6.github.io/demo-sites-synthetic-monitor/**
+
+All results below come from real runs. Raw results are on the [`data` branch](https://github.com/rohi-mahajan6/demo-sites-synthetic-monitor/tree/data).
+
+### First CI run: InvenTree failure caught ([run 45393071911](https://github.com/rohi-mahajan6/demo-sites-synthetic-monitor/actions/runs/45393071911), 2026-11-24 12:24 UTC)
+
+| Site | Status | Duration | Detail |
+| ---- | ------ | -------- | ------ |
+| SauceDemo | pass | 755 ms | |
+| ParaBank | pass | 1382 ms | |
+| InvenTree demo | **fail** (both attempts) | 22792 ms | step `log in`: `page.waitForURL: Timeout 20000ms exceeded` |
+
+The retry ran 30 s later and failed the same way. Screenshots and traces of both attempts were uploaded, and no issue was opened, because the alert rule needs 2 consecutive failures.
+
+**Cause: a login timing race in the check, not in the site.** The InvenTree login form becomes visible before the app finishes its startup session checks (`GET /api/auth/v1/auth/session`, called twice). Text typed during that window is lost when the form re-renders: the fields are cleared and the click sends no login request. Tracing three local logins reproduced it in one of three.
+
+**Fix** (commit `57d4c93`):
+- wait for the login page's network to settle before typing;
+- confirm both fields still hold their values before submitting;
+- read the login API's answer, so a rejected login (400) is reported as `fail` and rate limiting (429) or a server error (5xx) as `unavailable`, instead of a generic timeout.
+
+The fixed journey then passed 5 of 5 local runs.
+
+### Green run after the fix ([run 45400063311](https://github.com/rohi-mahajan6/demo-sites-synthetic-monitor/actions/runs/45400063311), 2026-11-24 13:07 UTC)
+
+| Site | Status | Duration | Detail |
+| ---- | ------ | -------- | ------ |
+| SauceDemo | pass | 625 ms | 6 products, total $32.39 |
+| ParaBank | pass | 1031 ms | 18 accounts |
+| InvenTree demo | pass | 11678 ms | login API 200, 25 rows rendered, 411 parts, server 1.8.0 dev (API 583) |
+
+All three passed on the first attempt. The status page then showed 2 runs, and InvenTree's 7-day uptime was 50%, because the earlier failure is kept in the history.
+
+### Local run before the first CI run (2026-11-24, Windows, Node 26, Playwright 1.65.1)
 
 | Site | Status | Duration |
 | ---- | ------ | -------- |
 | SauceDemo | pass | 4151 ms |
 | ParaBank | pass | 9305 ms |
 | InvenTree demo | pass | 13215 ms |
-
-_Pending: scheduled CI runs and the published status page. This section will only contain results from real runs._
 
 ## 7. Run locally
 
