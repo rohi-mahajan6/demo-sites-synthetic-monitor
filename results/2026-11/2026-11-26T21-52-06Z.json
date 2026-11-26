@@ -1,0 +1,169 @@
+{
+  "schemaVersion": 1,
+  "runId": "45900980653",
+  "timestamp": "2026-11-26T21:52:06.791Z",
+  "trigger": "schedule",
+  "ci": {
+    "runUrl": "https://github.com/rohi-mahajan6/demo-sites-synthetic-monitor/actions/runs/45900980653",
+    "runner": "Linux (GitHub Actions)"
+  },
+  "results": [
+    {
+      "site": "saucedemo",
+      "siteName": "SauceDemo",
+      "journey": "checkout",
+      "url": "https://www.saucedemo.com/",
+      "status": "pass",
+      "durationMs": 761,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "pass",
+          "durationMs": 761,
+          "failingStep": null
+        }
+      ],
+      "flaky": false,
+      "failingStep": null,
+      "steps": [
+        {
+          "name": "open login page",
+          "status": "pass",
+          "durationMs": 305
+        },
+        {
+          "name": "log in",
+          "status": "pass",
+          "durationMs": 121
+        },
+        {
+          "name": "add backpack to cart",
+          "status": "pass",
+          "durationMs": 47
+        },
+        {
+          "name": "open cart",
+          "status": "pass",
+          "durationMs": 66
+        },
+        {
+          "name": "enter checkout details",
+          "status": "pass",
+          "durationMs": 157
+        },
+        {
+          "name": "finish order",
+          "status": "pass",
+          "durationMs": 65
+        }
+      ],
+      "meta": {
+        "inventoryItems": 6,
+        "total": "$32.39"
+      },
+      "artifacts": []
+    },
+    {
+      "site": "parabank",
+      "siteName": "ParaBank",
+      "journey": "login-balance",
+      "url": "https://parabank.parasoft.com/parabank/",
+      "status": "pass",
+      "durationMs": 1607,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "pass",
+          "durationMs": 1607,
+          "failingStep": null
+        }
+      ],
+      "flaky": false,
+      "failingStep": null,
+      "steps": [
+        {
+          "name": "API login",
+          "status": "pass",
+          "durationMs": 292
+        },
+        {
+          "name": "open home page",
+          "status": "pass",
+          "durationMs": 617
+        },
+        {
+          "name": "log in",
+          "status": "pass",
+          "durationMs": 452
+        },
+        {
+          "name": "accounts overview",
+          "status": "pass",
+          "durationMs": 16
+        },
+        {
+          "name": "account activity",
+          "status": "pass",
+          "durationMs": 230
+        }
+      ],
+      "meta": {
+        "accountCount": 13
+      },
+      "artifacts": []
+    },
+    {
+      "site": "inventree",
+      "siteName": "InvenTree demo",
+      "journey": "login-dashboard",
+      "url": "https://demo.inventree.org/",
+      "status": "pass",
+      "durationMs": 9740,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "pass",
+          "durationMs": 9740,
+          "failingStep": null
+        }
+      ],
+      "flaky": false,
+      "failingStep": null,
+      "steps": [
+        {
+          "name": "API server info",
+          "status": "pass",
+          "durationMs": 558
+        },
+        {
+          "name": "open login page",
+          "status": "pass",
+          "durationMs": 2781
+        },
+        {
+          "name": "log in",
+          "status": "pass",
+          "durationMs": 3456
+        },
+        {
+          "name": "session user",
+          "status": "pass",
+          "durationMs": 206
+        },
+        {
+          "name": "parts list",
+          "status": "pass",
+          "durationMs": 2738
+        }
+      ],
+      "meta": {
+        "serverVersion": "1.8.0 dev",
+        "apiVersion": 584,
+        "loginHttpStatus": 200,
+        "partsListRows": 25,
+        "partsTotal": 562
+      },
+      "artifacts": []
+    }
+  ]
+}
