@@ -8,8 +8,8 @@
       "alertedStatus": null
     },
     "parabank": {
-      "lastStatus": "pass",
-      "nonPassStreak": 0,
+      "lastStatus": "fail",
+      "nonPassStreak": 1,
       "unavailableStreak": 0,
       "issueNumber": null,
       "alertedStatus": null
@@ -22,5 +22,5 @@
       "alertedStatus": null
     }
   },
-  "updatedAt": "2026-11-26T21:52:06.791Z"
+  "updatedAt": "2026-11-27T08:59:28.053Z"
 }

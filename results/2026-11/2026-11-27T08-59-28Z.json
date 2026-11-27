@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 1,
+  "runId": "45969896241",
+  "timestamp": "2026-11-27T08:59:28.053Z",
+  "trigger": "schedule",
+  "ci": {
+    "runUrl": "https://github.com/rohi-mahajan6/demo-sites-synthetic-monitor/actions/runs/45969896241",
+    "runner": "Linux (GitHub Actions)"
+  },
+  "results": [
+    {
+      "site": "saucedemo",
+      "siteName": "SauceDemo",
+      "journey": "checkout",
+      "url": "https://www.saucedemo.com/",
+      "status": "pass",
+      "durationMs": 856,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "pass",
+          "durationMs": 856,
+          "failingStep": null
+        }
+      ],
+      "flaky": false,
+      "failingStep": null,
+      "steps": [
+        {
+          "name": "open login page",
+          "status": "pass",
+          "durationMs": 375
+        },
+        {
+          "name": "log in",
+          "status": "pass",
+          "durationMs": 132
+        },
+        {
+          "name": "add backpack to cart",
+          "status": "pass",
+          "durationMs": 48
+        },
+        {
+          "name": "open cart",
+          "status": "pass",
+          "durationMs": 70
+        },
+        {
+          "name": "enter checkout details",
+          "status": "pass",
+          "durationMs": 164
+        },
+        {
+          "name": "finish order",
+          "status": "pass",
+          "durationMs": 67
+        }
+      ],
+      "meta": {
+        "inventoryItems": 6,
+        "total": "$32.39"
+      },
+      "artifacts": []
+    },
+    {
+      "site": "parabank",
+      "siteName": "ParaBank",
+      "journey": "login-balance",
+      "url": "https://parabank.parasoft.com/parabank/",
+      "status": "fail",
+      "durationMs": 131,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "fail",
+          "durationMs": 382,
+          "failingStep": {
+            "name": "API login",
+            "index": 0,
+            "error": "API login answered HTTP 400",
+            "httpStatus": null
+          }
+        },
+        {
+          "attempt": 2,
+          "status": "fail",
+          "durationMs": 131,
+          "failingStep": {
+            "name": "API login",
+            "index": 0,
+            "error": "API login answered HTTP 400",
+            "httpStatus": null
+          }
+        }
+      ],
+      "flaky": false,
+      "failingStep": {
+        "name": "API login",
+        "index": 0,
+        "error": "API login answered HTTP 400",
+        "httpStatus": null
+      },
+      "steps": [
+        {
+          "name": "API login",
+          "status": "fail",
+          "durationMs": 131
+        }
+      ],
+      "meta": {},
+      "artifacts": [
+        "parabank/attempt-1.png",
+        "parabank/attempt-1-trace.zip",
+        "parabank/attempt-2.png",
+        "parabank/attempt-2-trace.zip"
+      ]
+    },
+    {
+      "site": "inventree",
+      "siteName": "InvenTree demo",
+      "journey": "login-dashboard",
+      "url": "https://demo.inventree.org/",
+      "status": "pass",
+      "durationMs": 12564,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "pass",
+          "durationMs": 12564,
+          "failingStep": null
+        }
+      ],
+      "flaky": false,
+      "failingStep": null,
+      "steps": [
+        {
+          "name": "API server info",
+          "status": "pass",
+          "durationMs": 551
+        },
+        {
+          "name": "open login page",
+          "status": "pass",
+          "durationMs": 3029
+        },
+        {
+          "name": "log in",
+          "status": "pass",
+          "durationMs": 5304
+        },
+        {
+          "name": "session user",
+          "status": "pass",
+          "durationMs": 255
+        },
+        {
+          "name": "parts list",
+          "status": "pass",
+          "durationMs": 3425
+        }
+      ],
+      "meta": {
+        "serverVersion": "1.8.0 dev",
+        "apiVersion": 584,
+        "loginHttpStatus": 200,
+        "partsListRows": 25,
+        "partsTotal": 410
+      },
+      "artifacts": []
+    }
+  ]
+}
